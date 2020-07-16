@@ -1,6 +1,8 @@
 package org.launchcode.javawebdevtechjobspersistent.controllers;
 
+import org.launchcode.javawebdevtechjobspersistent.models.Employer;
 import org.launchcode.javawebdevtechjobspersistent.models.Job;
+import org.launchcode.javawebdevtechjobspersistent.models.Skill;
 import org.launchcode.javawebdevtechjobspersistent.models.data.EmployerRepository;
 import org.launchcode.javawebdevtechjobspersistent.models.data.JobRepository;
 import org.launchcode.javawebdevtechjobspersistent.models.data.SkillRepository;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by LaunchCode
@@ -54,6 +57,15 @@ public class HomeController {
             return "add";
         }
 
+        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+        newJob.setSkills(skillObjs);
+        Optional<Employer> optionalEmployer = employerRepository.findById(employerId);
+        Employer employer = optionalEmployer.get();
+        newJob.setEmployer(employer);
+        if (newJob.getSkills() == null) {
+            errors.rejectValue("skills","skills.empty","Error - job must include at least one skill!");
+            return "add";
+        }
         jobRepository.save(newJob);
 
         return "redirect:";
